@@ -1,6 +1,5 @@
 <?php
-
-class userpoints_txn_handler_field_the_rules extends views_handler_field {
+  class userpoints_txn_handler_field_the_rules extends views_handler_field {
     function render($values) {
         $txn_points = $values->userpoints_txn_points;
         $txn_reference = $values->userpoints_txn_reference;    //活动场景，区分活动
