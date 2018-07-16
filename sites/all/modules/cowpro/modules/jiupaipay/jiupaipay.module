@@ -155,6 +155,18 @@ function jiupaipay_menu() {
            'access callback' => TRUE,
            'type' => MENU_CALLBACK,
     );
+    $items ['cowpro/jiupaipay/user_info'] = array (
+			'title' => '查看用户在九派账号信息',
+			'description' => '查看用户在九派账号信息',
+			'page callback' => '_jiupaipay_ledger_account',
+			'page arguments' => '',
+			'access arguments' => array (
+					'configure p2p',
+			),
+			'menu_name' => 'navigation',
+			'type' => MENU_NORMAL_ITEM,
+			'file' => 'includes/jiupaipay.ledger_account.inc'
+	);
 	return $items;
 }
 function jiupaipay_topup_marketing_form($form, &$form_state) {
@@ -912,6 +924,7 @@ function jiupaipay_topup_feedback_ajax(){
     $journal_id = $_GET ['journal_id'];
     $result = db_query("SELECT status,data FROM {cowpro_fund_journal} WHERE journal_id='".$journal_id."' and status<>99");
     $journal_data = array ();
+    $response = "";
     foreach ($result as $record) {
       $journal_data=unserialize($record->data);
       $respMsg=$journal_data['result']['inBody']['respMsg'];
