@@ -167,8 +167,51 @@ function jiupaipay_menu() {
 			'type' => MENU_NORMAL_ITEM,
 			'file' => 'includes/jiupaipay.ledger_account.inc'
 	);
+    $items ['cowpro/jiupaipay/delete_user_profile'] = array (
+			'title' => '删除用户资料',
+			'description' => '删除用户资料',
+			'page callback' => 'drupal_get_form',
+			'page arguments' => array (
+					'jiupaipay_delete_user_profile_form',
+			),
+			'access arguments' => array (
+					'configure p2p',
+			),
+			'menu_name' => 'navigation',
+			'type' => MENU_NORMAL_ITEM,
+	);  
 	return $items;
 }
+              
+function jiupaipay_delete_user_profile_form(){
+        $form = array ();
+	$form ['uid'] = array (
+			'#type' => 'numberfield',
+			'#title' => '需要删除资料的用户ID',
+			'#min' => 0,
+			'#max' => 99999999,
+			'#required' => TRUE,
+			'#input' => TRUE
+	);
+
+	$form ['topup_marketing'] = array (
+			'#type' => 'submit',
+			'#value' => '提交'
+	);
+	return $form;
+}
+
+//删除指定用户的资料
+function jiupaipay_delete_user_profile_form_submit($form, &$form_state) {
+	$data ['uid'] = $form_state ['input'] ['uid'];
+        $profiles = cowpro_customer_profile_load_with_conditions($data['uid']);
+        foreach( $profiles as $key=>$value ){
+            cowpro_customer_profile_delete($key);
+        }
+        watchdog('YBCCB', "删除资料的用户ID".$data ['uid'], NULL, WATCHDOG_DEBUG);//YBCCB 意指“宜宾市商业银行”
+        drupal_set_message("操作成功!");
+}
+
 function jiupaipay_topup_marketing_form($form, &$form_state) {
 	$form = array ();
 	$form ['amount'] = array (
