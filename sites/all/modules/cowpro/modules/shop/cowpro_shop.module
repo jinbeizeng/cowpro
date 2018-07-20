@@ -326,12 +326,14 @@ function _cowpro_shop_buy_item($nid, $vid, $title, $price, $qty, $mbl = NULL) {
                     $rule = array(750=>50, 1480=>100, 2900=>200);
                     foreach( $rule as $key=>$value ){
                         if( $amount % $key == 0 ) {
-                             $voucher = $value * $qty;
+                             $voucher = $value;
                              break;
                         }
                     }
+					 $flag = true;
 
-                    $params_voucher = array (
+                    for( $i=0;  $i < $qty ;$i++ ){
+                         $params_voucher = array (
                                 'uid' => $user->uid,
                                 'points' => $voucher,
                                 'description' => "积分兑换代金券",
@@ -342,9 +344,15 @@ function _cowpro_shop_buy_item($nid, $vid, $title, $price, $qty, $mbl = NULL) {
                                 'module' => 'cowpro_shop',
                                 'search_field' => '积分兑换代金券',
                                 'data' => array("reason"=>"积分兑换代金券"),
-                    );
-                    $result_voucher = userpoints_userpointsapi($params_voucher);
-                    if( $result_voucher['status'] ) {
+                        );
+                        $result_voucher = userpoints_userpointsapi($params_voucher);
+                        if( !$result_voucher['status'] ) {
+                            $flag = false;
+                        }
+                    }
+                    
+                   
+                    if( $flag ) {
                         $entity_value = array(
 				'status' => 1,
                     );
