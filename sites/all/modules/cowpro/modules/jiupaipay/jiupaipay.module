@@ -141,7 +141,7 @@ function jiupaipay_menu() {
 			'file' => 'includes/jiupaipay.ledger_account.inc'
 	);
 	$items ['cowpro/jiupaipay/topup_feedback'] = array (
-			'title' => '充值结果查询',
+			'title' => '充值、提现结果查询',
 			'page callback' => "drupal_get_form",
 			'page arguments' => array (
 					'jiupaipay_topup_feedback_form',
@@ -967,18 +967,15 @@ function jiupaipay_topup_feedback_ajax(){
     $journal_id = $_GET ['journal_id'];
     $result = db_query("SELECT status,data FROM {cowpro_fund_journal} WHERE journal_id='".$journal_id."' and status<>99");
     $journal_data = array ();
-    $response = "";
     foreach ($result as $record) {
       $journal_data=unserialize($record->data);
-      $respMsg=$journal_data['result']['inBody']['respMsg'];
-
-      if ($record->status == 1) {
-        $response=$respMsg;
-      }else if ($record->status == 0) {
-        $response=$respMsg;
+      $response=$journal_data['result']['inBody']['respMsg'];
+      $status=$record->status;
+      
+      if (($status == 1)||($status == 0)) {
+        drupal_json_output ( $response );
       }
     }
-    drupal_json_output ( $response );
 }
 
 function jiupaipay_update_status($nid, $status) {
