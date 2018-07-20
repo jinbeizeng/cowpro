@@ -102,6 +102,19 @@ class cowpro_users_handler_filter_mobile extends views_handler_filter {
   }
 
   function query() {
+      //按drupal文档，ensure_table 方法可以获得指定表在QUERY中的alias
+      //但实际上如果 alias 与 table name 不一样的时候，ensure_table 并不能返回我们需要的 alias
+      //所以，我们还要判断，如果没有得到 table_alias, 
+      //我们还要在 $this->view->query->relationships 中遍历查找指定表的 alias
+      $table_alias = $this->view->query->ensure_table('users');
+      if (! $table_alias) {
+		foreach( $this->view->query->relationships as $key => $value){
+			if ($value['base'] == 'users') {
+              $table_alias = $key;
+            }
+        }
+      }
+      
   	//$table = $this->ensure_my_table();
   	//$join = new views_join();
   	//$join->construct('cowpro_customer_profile', $this->table_alias, 'uid', 'uid');
@@ -121,6 +134,6 @@ class cowpro_users_handler_filter_mobile extends views_handler_filter {
   			$uid = $user->uid;
   		}
   	}
-  	$this->query->add_where($this->options['group'], "users.uid", $uid, "=");
+  	$this->query->add_where($this->options['group'], "$table_alias.uid", $uid, "=");
   }
 }
