@@ -1,4 +1,19 @@
 <?php
+
+/**
+ * Implementation of hook_menu()
+ */
+function survey_menu() {
+    $items ['survey/message'] = array (
+			'title' => '',
+			'description' => '',
+			'page callback' => 'survey_show_message',
+			'access callback' => 'user_is_logged_in',
+			'type' => MENU_NORMAL_ITEM,
+	);
+    return $items;
+}
+
 function survey_cowpro_customer_profile_survey_create($values) {
 	$values += array (
                         'type' => '风险承受能力问卷用户调查结果',
@@ -43,7 +58,7 @@ function survey_cowpro_customer_profile_type_info() {
         }
 	$profile_types ['survey'] = array (
 			'type' => 'survey',
-			'name' => '调查问卷',
+			'name' => '风险评测',
 			'description' => $description,
 			'help' => '',
 			'weight' => 100
@@ -59,7 +74,7 @@ function survey_user_view_detail($profile){
 		if (! $profile->verified) {
 			$verified = FALSE;
 			$markup = '去评测';
-			$message = "您还未进行调查问卷评测<a href='" . $goto_url . "' class='gotourl'>去评测</a>";
+			$message = "您还未进行风险评测<a href='" . $goto_url . "' class='gotourl'>去评测</a>";
 		} else {
                     $verified = TRUE;
                     $markup = '已评测';
@@ -68,7 +83,7 @@ function survey_user_view_detail($profile){
         }else {
 		$verified = FALSE;
 		$markup = '去评测';
-		$message = "您还未进行调查问卷评测<a href='" . $goto_url . "' class='gotourl'>去评测</a>";
+		$message = "您还未进行风险评测<a href='" . $goto_url . "' class='gotourl'>去评测</a>";
 	}
         $result ['verified'] = $verified;
 	$result ['markup'] = $markup;
@@ -81,12 +96,14 @@ function survey_user_view_detail($profile){
 /**
  * Implements hook_form_alter().
  */
-/*function survey_form_alter(&$form, $form_state, $form_id) {
-  if (isset($form['#node']->type) && $form_id == $form['#node']->type . '_client_form_'.$form["#node"]->nid && variable_get('webform_node_' . $form['#node']->type, FALSE)) {
-      $form['actions']['submit']['#submit'][] = 'survey_form_submit';
-      $form['submit']['#submit'][] = 'survey_form_submit';
+function survey_form_alter(&$form, &$form_state, $form_id) {
+
+  if (isset($form['#node']->type) && $form_id == $form['#node']->type . '_node_form' && variable_get('webform_node_' . $form['#node']->type, FALSE)) {
+      if( !_survey_ismobile_device() ) {
+        $form['#node']->webform['redirect_url'] = '';
+      }
   }
-}*/
+}
 
 /**
  * Implements hook_node_insert().
@@ -197,4 +214,48 @@ function survey_webform_submission_presave($node, &$submission){
    $survey_profile->level = $level_result;
    $survey_profile->verified = true;
    cowpro_customer_profile_save($survey_profile);
+   
+   if( !_survey_ismobile_device() ) {
+          $level_array = array(
+            1 => array("title"=>"保守型投资者","des"=>"根据评测结果：您的风险承担能力水平比较低， 您关注资产的安全性远超于资产的收益性， 所以低风险、高流动性的投资品种比较适合您。"),
+            2 => array("title"=>"稳健型投资者","des"=>"根据评测结果：您有比较有限的风险承受能力，对投资收益比较敏感，期望通过短期、持续、渐进的投资获得高于定期存款的回报。"),
+            3 => array("title"=>"积极型投资者","des"=>"根据评测结果：您有中高的风险承受能力，愿意承担可预见的投资风险去获取更多的收益，以一定的可预见风险换取超额收益。"),
+            4 => array("title"=>"激进型投资者","des"=>"根据评测结果：您有较高的风险承受能力，是富有冒险精神的积极型选手。在投资收益波动的情况下， 仍然保持积极进取的投资理念。"),
+
+            );
+    drupal_set_message('<div class="survey_message">'.$level_array[$level_result]["title"].'</div><div>'.$level_array[$level_result]["des"].'</div>');
+    drupal_goto("/registration_wizard");
+   }
+}
+
+function survey_show_message(){
+    global $user;
+     $survey_profile = cowpro_customer_profile_load_one_row_with_conditions($user->uid,"survey");
+     $level_array = array(
+                        1 => array("title"=>"保守型投资者","des"=>"根据评测结果：您的风险承担能力水平比较低， 您关注资产的安全性远超于资产的收益性， 所以低风险、高流动性的投资品种比较适合您。"),
+                        2 => array("title"=>"稳健型投资者","des"=>"根据评测结果：您有比较有限的风险承受能力，对投资收益比较敏感，期望通过短期、持续、渐进的投资获得高于定期存款的回报。"),
+                        3 => array("title"=>"积极型投资者","des"=>"根据评测结果：您有中高的风险承受能力，愿意承担可预见的投资风险去获取更多的收益，以一定的可预见风险换取超额收益。"),
+                        4 => array("title"=>"激进型投资者","des"=>"根据评测结果：您有较高的风险承受能力，是富有冒险精神的积极型选手。在投资收益波动的情况下， 仍然保持积极进取的投资理念。"),
+            
+                        );
+     $html = theme ( 'survey_message', array (
+			'title' => $level_array[$survey_profile->level]["title"],
+                        'des' => $level_array[$survey_profile->level]["des"],
+     ) );
+    return $html;
+}
+
+/**
+ * Implements hook_theme().
+ */
+function survey_theme() {
+	return array (
+			'survey_message' => array (
+					'variables' => array (
+                                            'title' => null,
+                                            'des' => null,
+					),
+					'template' => 'survey-message'
+			),
+	);
 }
