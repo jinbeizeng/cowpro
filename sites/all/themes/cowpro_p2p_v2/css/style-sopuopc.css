@@ -887,7 +887,7 @@ article, figure {
 #block-system-main .profile .the-list-block{padding-left: 10px;padding-right: 10px;float: left;text-align: center;}
 #block-system-main .profile dl{ overflow:scroll; margin-bottom: 0px; padding-top: 5px}
 #block-system-main .profile h3 { padding-bottom: 5px;color: #FFB226; font-size: 16px}
-//#block-system-main .profile .the-list-block:nth-child(4){ width: 30%}
+
 #block-system-main .profile dl:nth-of-type(4) .the-list-block,#block-system-main .cowpro_issuing_views .the-list-block {width: 100%;}
 #block-system-main .profile .the-list-block .view-content .views-table thead { background: #EFEFEF; font-size: 13px;border: 1px solid #DDDDDD; height: 30px; line-height: 30px}
 #block-system-main .profile .the-list-block .view-content .views-table tbody { border: 1px solid #DDDDDD;font-size: 12px }
@@ -2804,3 +2804,168 @@ font-family: Microsoft Yahei;
 .popBoxWraper .popBoxContent ul li.title{font-size:.2rem;margin-bottom:.05rem;margin-top:.2rem;line-height:.6rem}
 .popBoxWraper .popBoxButtons{border:none;margin-top:.23rem}
 .popBoxWraper .popBoxButtons>.popBoxSure{border:none;width:5rem;height:.76rem;line-height:.76rem;color:#fff!important;font-size:.3rem;background:#ff7625;border-radius:.38rem;margin:auto;display:block;float:none}
+
+
+.content_box4 {  
+  background: #f5f5f5 !important;
+  z-index: -100;
+  opacity: 0;
+  height: 2rem;
+  overflow: hidden;
+  padding-bottom: 1rem;
+}
+
+.content_box4.content_box4_top {
+  z-index: auto;
+  opacity: 1;
+  height: auto;
+  overflow: auto;
+}
+
+.content_box4 .clearlist {
+  zoom: 1;
+}
+
+.content_box4 .clearlist:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+
+.content_box4 em {
+  font-style: normal;
+}
+
+.content_box4 .wrap {
+  background: #fff;
+}
+
+.content_box4 h2 {
+  color: #ffcc00;
+  font-size: 0.36rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.content_box4 p {
+  line-height: 0.5rem;
+  text-indent: 0.4rem;
+  font-size: 0.26rem;
+}
+
+.content_box4 p a {
+  color: #ffcc00;
+}
+
+.content_box4 .wrap1 {
+  padding: 0.3rem 0.3rem 0.3rem;
+}
+
+.content_box4 .wrap1 .img1 {
+  width: 6.9rem;
+  height: 3rem;
+  margin: 0.3rem 0;
+  background: url(../images/img1-banner.jpg) no-repeat center;
+  background-size: 100%;
+}
+
+.content_box4 .wrap2 {
+  margin-top: 0.2rem;
+  padding: 0.3rem;
+}
+
+.content_box4 .wrap2 ul li {
+  padding: 0.2rem 0;
+  line-height: 0.5rem;
+  border-bottom: 1px dashed  #e6e6e6;
+}
+
+.content_box4 .wrap2 ul li .l_t {
+  width: 2.3rem;
+  float: left;
+  color: #808080;
+  font-size: 0.24rem;
+}
+
+.content_box4 .wrap2 ul li .r_info {
+  width: 4.5rem;
+  float: left;
+  color: #333;
+  font-size: 0.26rem;
+}
+
+.content_box4 .wrap2 ul li:last-child {
+  border: none;
+}
+
+.content_box4 .wrap3 {
+  margin-top: 0.2rem;
+  padding: 0.3rem;
+}
+
+.content_box4 .wrap3 .img2 {
+  width: 6.94rem;
+  height: 2.85rem;
+  margin: 0.3rem 0;
+  background-size: 100%;
+}
+
+.content_box4 .wrap4 {
+  margin-top: 0.2rem;
+  padding: 0.3rem;
+}
+
+.content_box4 .wrap4 .img3 {
+  width: 6.44rem;
+  height: 2.57rem;
+  margin: 0.6rem auto;
+  background: url(https://images.limin.com/activity/platform/mes_pl/img/img3_b9c4d.png) no-repeat center;
+  background-size: 100%;
+}
+
+.content_box4 .wrap5 {
+  position: relative;
+  margin-top: 0.2rem;
+  padding: 0.3rem;
+  height: 4.5rem;
+}
+
+.content_box4 .wrap5 .swiper-container1 {
+  margin-top: 0.3rem;
+}
+
+.content_box4 .wrap5 .swiper-slide {
+  text-align: center;
+}
+
+.content_box4 .wrap5 .swiper-pagination {
+  bottom: 0.9rem;
+  width: 100%;
+  left: 0;
+  text-align: center;
+}
+
+.content_box4 .wrap5 .swiper-pagination .swiper-pagination-bullet {
+  margin: 0  0.05rem;
+}
+
+.content_box4 .swiper-container2 {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: -100;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.content_box4 .swiper-container2.cover {
+  z-index: 100;
+  opacity: 1;
+}
+
+.content_box4 .swiper-container2 .swiper-slide img {
+  width: 96%;
+  height: auto;
+}
