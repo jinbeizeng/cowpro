@@ -75,12 +75,6 @@ jQuery(document).ready(function($){
             alert(msg.text());
     }
   
-  	$("#cowpro-fund-withdraw #edit-amount").blur(function(){
-      if( $(this).val() < 100 ) {
-        alert("提现金额小于100元时，收取1元手续费。");
-      }
-    });
-   
 });
 
     window.alert = function(str)  

@@ -1,10 +1,14 @@
 <?php
 function cowpro_fund_withdraw($form, &$form_state) {
+  // Check for confirmation forms.
+  if (isset($form_state['confirm_fee'])) {
+    return cowpro_fund_withdraw_confirm_fee($form_state);
+  }
+  if (isset($form_state['confirm_fee_ok'])) {
+    return cowpro_fund_withdraw_do($form_state);
+  }
+  
 	$form = array ();
-
-	$form['withdraw_information'] = array(
-			'#markup' => '<ul><li>提现金额小于￥100元时，系统将收到提现手续费￥1元。</li></ul>',
-	);
 
 	$custodian_key = custodian_default_provider_key();
 	$custodian_title = custodian_readable_provider_title($custodian_key);
@@ -55,40 +59,36 @@ function cowpro_fund_withdraw($form, &$form_state) {
 			'#value' => '提现'
 	);
 
+	foreach (module_implements('cowpro_fund_withdraw_helper') as $module) {
+	  $form_helper = module_invoke($module, 'cowpro_fund_withdraw_helper', $form, $form_state);
+	  $form = array_merge($form_helper, $form);
+	}
+
 	return $form;
 }
 function cowpro_fund_withdraw_validate($form, &$form_state) {
 	if ($form_state['clicked_button']['#name'] == 'op') {
-		if (( float ) trim ( $form_state ['input'] ['amount'] ) <= 0) {
+		if (( float ) trim ( $form_state ['values'] ['amount'] ) <= 0) {
 			form_error ( $form ['amount'], "请填写有效的提现金额" );
 		}
 	}
 }
 function cowpro_fund_withdraw_submit($form, &$form_state) {
 	if ($form_state['clicked_button']['#name'] == 'op') {
-		$uid = $GLOBALS['user']->uid;
-		$amount = $form_state ['input'] ['amount'];
-		$card = cowpro_customer_profile_load_one_row_with_conditions ( $uid, 'bank_card' );
-		$entity_value = array(
-				'uid' => $uid,
-				'status' => 99,
-				'type' => 'WITHDRAW',
-				'amount' => $amount,
-		);
-		$entity = entity_create('cowpro_fund_journal', $entity_value);
-		$entity = entity_get_controller('cowpro_fund_journal')->save($entity);
-		$journal_id = $entity->journal_id;
-
-		//提现金额小于￥100元时，系统将收到提现手续费￥1元
-		$fee = 0;
-		if ($amount < 100) {
-			$fee = 1;
-			$amount = $amount - 1;
-		}
-		$result = custodian_cowpro_fund_withdraw($uid, $amount,	$fee, $card, $journal_id);
-		if (! $result['success']) {
-			drupal_set_message($result ['message'], 'error');
-		}
+	  $amount = $form_state ['values'] ['amount'];
+	  $fee = 0;
+	  foreach (module_implements('cowpro_fund_withdraw_fee') as $module) {
+	    $fee = $fee + module_invoke($module, 'cowpro_fund_withdraw_fee', $amount);
+	  }
+	  $form_state['values']['fee'] = $fee;
+	  
+	  //如果手续费为零，不需要显示“手续费确认”窗口
+	  if (($fee == 0) || isset($form_state['confirm_fee'])) {
+	    return cowpro_fund_withdraw_do($form_state);
+	  }
+	  $form_state['rebuild'] = TRUE;
+	  $form_state['confirm_fee'] = TRUE;
+	  return;
 	} else if ($form_state['clicked_button']['#name'] == 'bankcard_operator') {
 		$uid = $GLOBALS ['user']->uid;
 		$profile = cowpro_customer_profile_load_one_row_with_conditions ( $uid, 'bank_card' );
@@ -97,6 +97,49 @@ function cowpro_fund_withdraw_submit($form, &$form_state) {
 		$form_state['redirect'] = 'registration_wizard/bank_card';
 	}
 }
+
+function cowpro_fund_withdraw_do($form_state) {
+  
+  $uid = $GLOBALS['user']->uid;
+  $amount = $form_state ['values'] ['amount'];
+  $fee = $form_state['values']['fee'];
+  $card = cowpro_customer_profile_load_one_row_with_conditions ( $uid, 'bank_card' );
+  $entity_value = array(
+    'uid' => $uid,
+    'status' => 99,
+    'type' => 'WITHDRAW',
+    'amount' => $amount,
+  );
+  $entity = entity_create('cowpro_fund_journal', $entity_value);
+  $entity = entity_get_controller('cowpro_fund_journal')->save($entity);
+  $journal_id = $entity->journal_id;
+    
+  $result = custodian_cowpro_fund_withdraw($uid, $amount,	$fee, $card, $journal_id);
+  if (! $result['success']) {
+    drupal_set_message($result ['message'], 'error');
+  }
+  
+}
+
+function cowpro_fund_withdraw_confirm_fee($form_state) {
+  $form_state['confirm_fee_ok'] = TRUE;
+  $form['amount'] = array('#type' => 'value', '#value' => $form_state ['values'] ['amount']);
+  $form['fee'] = array('#type' => 'value', '#value' => $form_state ['values'] ['fee']);
+  
+  $form['confirm_amount'] = array(
+    '#markup' => '<ul><li>提现金额：' . $form_state['values']['amount'] . '元</li></ul>',
+  );
+  $form['confirm_fee'] = array(
+    '#markup' => '<ul><li>提现手续费：' . $form_state['values']['fee'] . '元</li></ul>',
+  );
+  return confirm_form($form,
+      t('请确认手续费'),
+      'cowpro/fund/withdraw',
+      t('提现手续费将从账户中扣除。'),
+      t('继续'),
+      t('取消'));
+}
+
 function cowpro_fund_get_bankcard($reset = FALSE) {
 	$form = array ();
 	$form ['bankcard'] = array (
