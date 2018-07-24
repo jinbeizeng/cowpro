@@ -389,3 +389,17 @@ function cowpro_fund_cowpro_fund_withdraw_fee($amount) {
   }
  return $fee;
 }
+
+/**
+ * Implements hook_cowpro_fund_withdraw_confirm().
+ */
+function cowpro_fund_cowpro_fund_withdraw_confirm($form, $form_state) {
+  $form_confirm = array();
+  $form_confirm['confirm_amount'] = array(
+    '#markup' => '<ul><li>提现金额：' . $form_state['values']['amount'] . '元</li></ul>',
+  );
+  $form_confirm['confirm_fee'] = array(
+    '#markup' => '<ul><li>提现手续费：' . $form_state['values']['fee'] . '元</li></ul>',
+  );
+  return $form_confirm;
+}

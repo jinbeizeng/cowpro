@@ -83,7 +83,7 @@ function cowpro_fund_withdraw_submit($form, &$form_state) {
 	  $form_state['values']['fee'] = $fee;
 	  
 	  //如果手续费为零，不需要显示“手续费确认”窗口
-	  if (($fee == 0) || isset($form_state['confirm_fee'])) {
+	  if (isset($form_state['confirm_fee'])) {
 	    return cowpro_fund_withdraw_do($form_state);
 	  }
 	  $form_state['rebuild'] = TRUE;
@@ -114,6 +114,7 @@ function cowpro_fund_withdraw_do($form_state) {
   $entity = entity_get_controller('cowpro_fund_journal')->save($entity);
   $journal_id = $entity->journal_id;
     
+  $amount = $amount - $fee;
   $result = custodian_cowpro_fund_withdraw($uid, $amount,	$fee, $card, $journal_id);
   if (! $result['success']) {
     drupal_set_message($result ['message'], 'error');
@@ -123,19 +124,19 @@ function cowpro_fund_withdraw_do($form_state) {
 
 function cowpro_fund_withdraw_confirm_fee($form_state) {
   $form_state['confirm_fee_ok'] = TRUE;
+  $form = array();
   $form['amount'] = array('#type' => 'value', '#value' => $form_state ['values'] ['amount']);
   $form['fee'] = array('#type' => 'value', '#value' => $form_state ['values'] ['fee']);
   
-  $form['confirm_amount'] = array(
-    '#markup' => '<ul><li>提现金额：' . $form_state['values']['amount'] . '元</li></ul>',
-  );
-  $form['confirm_fee'] = array(
-    '#markup' => '<ul><li>提现手续费：' . $form_state['values']['fee'] . '元</li></ul>',
-  );
+  foreach (module_implements('cowpro_fund_withdraw_confirm') as $module) {
+    $form_confirm = module_invoke($module, 'cowpro_fund_withdraw_confirm', $form, $form_state);
+    $form = array_merge($form_confirm, $form);
+  }
+  
   return confirm_form($form,
       t('请确认手续费'),
       'cowpro/fund/withdraw',
-      t('提现手续费将从账户中扣除。'),
+      t('提现手续费将从提现金额中扣除。'),
       t('继续'),
       t('取消'));
 }
