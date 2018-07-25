@@ -93,9 +93,9 @@ function jiupaipay_lender_curl_post_data($uid) {
 	$result = jiupaipay_curl_api ( $curl_post_data );
 	$result = json_decode ( $result, true );
 
-	$result ['outBody'] ['accNo'] = $aes->decrypt ( $result ['outBody'] ['accNo'] );
         
 	if ($result ['respHeader'] ['respCode'] == 'P2P0000' && _jiupaipay_verify_api ( $result ['outBody'], $result ['respHeader'] ['signature'], $result ['respHeader'] ['signTime'] )) {
+      	$result ['outBody'] ['accNo'] = $aes->decrypt ( $result ['outBody'] ['accNo'] );
 		$account = $result ['outBody'] ['accNo'];
 		$profile = cowpro_customer_profile_load_one_row_with_conditions ( $uid, 'jiupaipay' );
 		if ($profile == NULL) {
