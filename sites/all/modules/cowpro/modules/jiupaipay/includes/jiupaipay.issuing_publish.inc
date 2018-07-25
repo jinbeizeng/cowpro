@@ -37,7 +37,12 @@ function jiupaipay_issuing_publish($nid, $busiTradeType = "P01", $projectStatus 
 	$post_data ['businessSeqNo'] = "jbz_" . date ( "Ymd", time () ) . time () . "@" . $busiTradeType . "@" . $projectStatus;
 	$post_data ['objectId'] = $nid;
 	$post_data ['objectName'] = $node->title;
-	$post_data ['totalAmount'] = $node->field_issuing [LANGUAGE_NONE] [0] ['loan_amounts'];
+	if ($busiTradeType === 'P04') {
+	  //如果是修改标的状态，totalAmount必须是NULL
+	  $post_data ['totalAmount'] = NULL;
+	} else {
+	   $post_data ['totalAmount'] = $node->field_issuing [LANGUAGE_NONE] [0] ['loan_amounts'];
+	}
 	$post_data ['interestRate'] = $node->field_issuing [LANGUAGE_NONE] [0] ['annual_rate'];
 	$post_data ['returnType'] = "01";
 	$loan_term = $node->field_issuing [LANGUAGE_NONE] [0] ['loan_term'] / 30;
