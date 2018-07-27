@@ -887,7 +887,7 @@ article, figure {
 #block-system-main .profile .the-list-block{padding-left: 10px;padding-right: 10px;float: left;text-align: center;}
 #block-system-main .profile dl{ overflow:scroll; margin-bottom: 0px; padding-top: 5px}
 #block-system-main .profile h3 { padding-bottom: 5px;color: #FFB226; font-size: 16px}
-
+//#block-system-main .profile .the-list-block:nth-child(4){ width: 30%}
 #block-system-main .profile dl:nth-of-type(4) .the-list-block,#block-system-main .cowpro_issuing_views .the-list-block {width: 100%;}
 #block-system-main .profile .the-list-block .view-content .views-table thead { background: #EFEFEF; font-size: 13px;border: 1px solid #DDDDDD; height: 30px; line-height: 30px}
 #block-system-main .profile .the-list-block .view-content .views-table tbody { border: 1px solid #DDDDDD;font-size: 12px }
@@ -2805,7 +2805,6 @@ font-family: Microsoft Yahei;
 .popBoxWraper .popBoxButtons{border:none;margin-top:.23rem}
 .popBoxWraper .popBoxButtons>.popBoxSure{border:none;width:5rem;height:.76rem;line-height:.76rem;color:#fff!important;font-size:.3rem;background:#ff7625;border-radius:.38rem;margin:auto;display:block;float:none}
 
-
 .content_box4 {  
   background: #f5f5f5 !important;
   z-index: -100;
@@ -2968,4 +2967,7 @@ font-family: Microsoft Yahei;
 .content_box4 .swiper-container2 .swiper-slide img {
   width: 96%;
   height: auto;
+}
+.page-user #alertFram ul li:nth-child(2){
+  line-height: 40px !important;
 }
