@@ -37,7 +37,12 @@ function jiupaipay_issuing_publish($nid, $busiTradeType = "P01", $projectStatus 
 	$post_data ['businessSeqNo'] = "jbz_" . date ( "Ymd", time () ) . time () . "@" . $busiTradeType . "@" . $projectStatus;
 	$post_data ['objectId'] = $nid;
 	$post_data ['objectName'] = $node->title;
-	$post_data ['totalAmount'] = $node->field_issuing [LANGUAGE_NONE] [0] ['loan_amounts'];
+	if ($busiTradeType === 'P04') {
+	  //如果是修改标的状态，totalAmount必须是NULL
+	  $post_data ['totalAmount'] = NULL;
+	} else {
+	   $post_data ['totalAmount'] = $node->field_issuing [LANGUAGE_NONE] [0] ['loan_amounts'];
+	}
 	$post_data ['interestRate'] = $node->field_issuing [LANGUAGE_NONE] [0] ['annual_rate'];
 	$post_data ['returnType'] = "01";
 	$loan_term = $node->field_issuing [LANGUAGE_NONE] [0] ['loan_term'] / 30;
@@ -85,7 +90,10 @@ function jiupaipay_issuing_publish($nid, $busiTradeType = "P01", $projectStatus 
 
 	$result_jpp = array ();
 	$result_jpp ['success'] = false;
-	$result ['outBody'] ['objectaccNo'] = $aes->decrypt ( $result ['outBody'] ['objectaccNo'] );
+  
+    if( !empty($result ['outBody'] ['objectaccNo']) ) {
+      $result ['outBody'] ['objectaccNo'] = $aes->decrypt ( $result ['outBody'] ['objectaccNo'] );
+    }
 
 	if ($result ['respHeader'] ['respCode'] == 'P2P0000' && _jiupaipay_verify_api ( $result ['outBody'], $result ['respHeader'] ['signature'], $result ['respHeader'] ['signTime'] )) {
 		if ($busiTradeType == "P01") {
