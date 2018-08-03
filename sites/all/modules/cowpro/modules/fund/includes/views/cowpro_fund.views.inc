@@ -171,7 +171,7 @@ function cowpro_fund_views_data()
     				'handler' => 'views_handler_sort_date',
     		),
     		'filter' => array(
-    				'handler' => 'views_handler_filter_date',
+    		  'handler' => 'cowpro_date_views_filter_handler_simple',
     		),
     );
 
