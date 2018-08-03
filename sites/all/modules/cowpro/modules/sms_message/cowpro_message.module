@@ -14,7 +14,8 @@ const COWPRO_SMS_REPAYMENT_REMIND_MESSAGE = '尊敬的用户[user:name]，您本
 const COWPRO_SMS_FUND_TOPUP_MESSAGE = '尊敬的用户[user:name]，您刚才充值[cowpro_fund_journal:amount]已成功，特此通知。';
 const COWPRO_SMS_FUND_WITHDRAW_MESSAGE = '尊敬的用户[user:name]，您刚才的提现申请[cowpro_fund_journal:amount]已提交，特此通知。';
 const COWPRO_SMS_SITE_MAINTENANCE_MESSAGE = '尊敬的用户您好，为配合银行存管系统上线，平台将于2017年12月21日12时-31日24时进行系统维护，维护期间您将暂时无法充值、提现、投资，详情见官网!';
-const COWPRO_SMS_WAITING_FOR_MAKE_LOANS = '尊敬的管理员[user:name]，贷款“[cowpro_issuing:title]”已满标，请尽快安排放款。';
+//const COWPRO_SMS_WAITING_FOR_MAKE_LOANS = '尊敬的管理员[user:name]，贷款“[cowpro_issuing:title]”已满标，请尽快安排放款。';
+const COWPRO_SMS_WAITING_FOR_MAKE_LOANS = '您在“[user:name]”网站的手机验证码是[cowpro_issuing:title],请不要将验证码告诉别人,如果您没有在网站上要求通过手机重置密码,请忽略这条短信。';
 
 /**
  *
