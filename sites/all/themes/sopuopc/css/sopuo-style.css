@@ -1281,9 +1281,42 @@ body{background-color: #f5f5f5;overflow-x: hidden;overflow-y: auto;}
 table.userpoints-myuserpoints-total td{ width: auto;}
 #edit-add-ownership{ height:600px}
 
-
 #unique-wrapper #bootstrap-panel--6 table{ width:100%; line-height:37px;}
 #unique-wrapper #bootstrap-panel--6 table tr{ border-bottom:1px solid #ddd;}
 #unique-wrapper #bootstrap-panel--6 table tr.odd{
     background-color: #f9f9f9;
+}
+
+#cowpro-fund-withdraw #edit-cancel{    
+    color: #666;
+    background-color: #e0dfdf;
+    border-color: #2e6da4;
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px
+}
+
+.gridtable_right {
+    width: 30% !important;
+    text-align: right !important;
+    margin-right: 30% !important;
+}
+.gridtable_1  .gridtable_tid:nth-child(3){
+    text-align: right !important;
 }
