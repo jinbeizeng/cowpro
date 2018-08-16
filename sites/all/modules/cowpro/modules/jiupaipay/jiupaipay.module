@@ -127,7 +127,21 @@ function jiupaipay_menu() {
 			'type' => MENU_NORMAL_ITEM,
 			'file' => 'includes/jiupaipay.topup.inc'
 	);
-
+	$items ['cowpro/jiupaipay/withdraw_marketing'] = array (
+	  'title' => '平台营销账号提现',
+	  'description' => '将平台营销账号资金转移到平台一般户',
+	  'page callback' => 'drupal_get_form',
+	  'page arguments' => array (
+	    'jiupaipay_withdraw_marketing_form',
+	  ),
+	  'access arguments' => array (
+	    'configure p2p',
+	  ),
+	  'menu_name' => 'navigation',
+	  'type' => MENU_NORMAL_ITEM,
+	  'file' => 'includes/jiupaipay.topup.inc'
+	);
+	
 	$items ['cowpro/jiupaipay/ledger_account'] = array (
 			'title' => '查看台账账号结果',
 			'description' => '查看台账账号结果',
@@ -258,6 +272,53 @@ function jiupaipay_topup_marketing_form_submit($form, &$form_state) {
 	) )->execute ();
 
 	jiupaipay_topup ( $uid, $data ['amount'], $data ['method'], $journal_id, $sql_data ['businessSeqNo'] );
+}
+function jiupaipay_withdraw_marketing_form($form, &$form_state) {
+  $form = array ();
+  $form ['amount'] = array (
+    '#type' => 'numberfield',
+    '#title' => '提现金额',
+    '#min' => 0,
+    '#max' => 999999,
+    '#required' => TRUE,
+    '#input' => TRUE
+  );
+  $form ['method'] = array (
+    '#type' => 'hidden',
+    '#value' => "3"
+  );
+  $form ['topup_marketing'] = array (
+    '#type' => 'submit',
+    '#value' => '提现'
+  );
+  return $form;
+}
+function jiupaipay_withdraw_marketing_form_submit($form, &$form_state) {
+  $data ['amount'] = $form_state ['input'] ['amount'];
+  global $user;
+  $uid = $user->uid;
+  
+  $entity_value = array (
+    'uid' => $uid,
+    'status' => FALSE,
+    'type' => 'TOPUP',
+    'amount' => $data ['amount'],
+  );
+  $entity = entity_create ( 'cowpro_fund_journal', $entity_value );
+  $entity = entity_get_controller ( 'cowpro_fund_journal' )->save ( $entity );
+  $journal_id = $entity->journal_id;
+  $data ['journal_id'] = $journal_id;
+  $sql_data ['data'] = serialize ( $data );
+  $sql_data ['businessSeqNo'] = "jbz" . date ( "Ymd", time () ) . time ();
+  $sql_data ['uid'] = $uid;
+  db_insert ( 'jiupaipay_data_tmp' )->fields ( array (
+    'data' => $sql_data ['data'],
+    'businessSeqNo' => $sql_data ['businessSeqNo'],
+    'uid' => $uid,
+  ) )->execute ();
+  
+  include_once 'includes/jiupaipay.withdraw_marketing.inc';
+  jiupaipay_withdraw_marketing( $uid, $data ['amount'], $journal_id, $sql_data ['businessSeqNo'] );
 }
 function jiupaipay_permission() {
 	$permissions = array (
