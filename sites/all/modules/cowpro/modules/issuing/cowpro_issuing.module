@@ -278,6 +278,25 @@ function cowpro_issuing_menu() {
 			'context' => MENU_CONTEXT_INLINE,
 	);
 
+	$items ['issuing/%node/renewal'] = array (
+	  'title' => '贷款续期',
+	  'description' => '贷款续期.',
+	  'page callback' => 'cowpro_issuing_command',
+	  'page arguments' => array (
+	    'issuing renewal',
+	    1,
+	  ),
+	  'access callback' => 'cowopro_issuing_access',
+	  'access arguments' => array (
+	    'issuing renewal',
+	    1,
+	  ),
+	  'file' => 'includes/cowpro_issuing.command.inc',
+	  'weight' => 30,
+	  'type' => MENU_CALLBACK | MENU_LOCAL_TASK,
+	  'context' => MENU_CONTEXT_INLINE,
+	);
+	
 	$items ['issuing/%node/temporary_advance'] = array (
 			'title' => '网站代偿',
 			'description' => '在贷款申请人自有资金不足的情况下，网站可以垫付资金给贷款人还款.',
@@ -1560,9 +1579,9 @@ function cowpro_issuing_field_attach_form($entity_type, $entity, &$form, &$form_
 		$form ['field_applicant'] ['#access'] = $access;
 	}
 }
-function cowpro_issuing_create_repayment_schedule($nid, $applicant, $issuing) {
+function cowpro_issuing_create_repayment_schedule($nid, $applicant, $issuing, $renewal=FALSE, $renewal_loan_term=0, $renewal_annual_rate=0) {
 	require_once 'includes/cowpro_issuing.repayment_schedule.fun.inc';
-	_cowpro_issuing_save_repayment_schedule ( $nid, $applicant, $issuing );
+	_cowpro_issuing_save_repayment_schedule ( $nid, $applicant, $issuing, $renewal, $renewal_loan_term, $renewal_annual_rate);
 }
 function cowpro_issuing_bid_list($nid) {
 	require_once 'includes/cowpro_issuing.bid.inc';

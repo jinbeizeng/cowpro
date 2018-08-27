@@ -16,6 +16,7 @@
  *        	- 'interrupt creditor assignment'://中止债权转让
  *        	- 'buy creditor assignment'://购买债权
  *        	- 'issuing repayment'://到期还款
+ *        	- 'issuing renewal'://贷款续期
  *        	- 'view contract'://查看合同
  *        	- 'download contract'://下载合同
  *        	- 'register custodian'://将标的信息注册到第三方托管服务商
@@ -111,6 +112,13 @@ function _cowopro_issuing_access($op, $node, $account = NULL) {
 				}
 			}
 			break;
+		case 'issuing renewal' : // 贷款续期
+		  if ($issuing ['status'] === COWPRO_ISSUING_STATUS_REPAYMENT) {
+		    if (user_access ( 'admin repayment', $account )) {
+		      $result = TRUE;
+		    }
+		  }
+		  break;
 		case 'temporary advance' : // 网站代偿
 			if ($issuing ['status'] === COWPRO_ISSUING_STATUS_REPAYMENT) {
 				$result = user_access ( 'temporary advance', $account );
@@ -260,6 +268,7 @@ function _cowpro_issuing_user_access_buy_creditor_assignment($nid, $account) {
  *        	- 'interrupt creditor assignment'://中止债权转让
  *        	- 'buy creditor assignment'://购买债权
  *        	- 'issuing repayment'://到期还款
+ *        	- 'issuing renewal'://贷款续期
  *        	- 'view contract'://查看合同
  *        	- 'download contract'://下载合同
  *        	- 'register custodian'://将标的信息注册到第三方托管服务商
@@ -329,6 +338,10 @@ function _cowpro_issuing_command($op, $node, $account = NULL) {
 			require_once 'cowpro_issuing.repayment.inc';
 			return _cowpro_issuing_repayment($node);
 			break;
+		case 'issuing renewal' : // 贷款续期
+		  require_once 'cowpro_issuing.renewal.inc';
+		  return _cowpro_issuing_renewal($node);
+		  break;
 		case 'temporary advance' : // 网站代偿
 			require_once 'cowpro_issuing.repayment.inc';
 			return _cowpro_issuing_temporary_advance($node);

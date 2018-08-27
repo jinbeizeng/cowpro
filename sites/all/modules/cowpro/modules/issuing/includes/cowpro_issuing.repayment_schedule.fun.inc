@@ -304,7 +304,7 @@ function _cowpro_issuing_build_repayment_schedule($loan_amounts, $annual_rate, $
 	return $schedule;
 }
 
-function _cowpro_issuing_build_repayment_schedule_for_issuing($nid, $applicant, $issuing) {
+function _cowpro_issuing_build_repayment_schedule_for_issuing($nid, $applicant, $annual_rate, $loan_term, $method_repayment, $make_loans_time) {
 	//根据还款方式计算每一期的还款额
 	$journal_list = cowpro_issuing_bid_list($nid);
 
@@ -327,7 +327,7 @@ function _cowpro_issuing_build_repayment_schedule_for_issuing($nid, $applicant, 
 	foreach ($journal_list as $journal) {
 		//$journal->uid 出借人
 		//$journal->amount 出借人的借款额
-		$schedule_list = _cowpro_issuing_build_repayment_schedule($journal->amount, $issuing['annual_rate'], $issuing['loan_term'], $issuing['method_repayment'], $issuing['make_loans_time']);
+	  $schedule_list = _cowpro_issuing_build_repayment_schedule($journal->amount, $annual_rate, $loan_term, $method_repayment, $make_loans_time);
 		foreach ($schedule_list as $key => $value) {
 			$value['payer_uid'] = $applicant['uid'];
 			$value['receiver_uid'] = $journal->uid;
@@ -365,9 +365,42 @@ function _cowpro_issuing_build_repayment_schedule_for_issuing($nid, $applicant, 
  * @param 贷款申请表的nid $nid
  * @param 贷款申请人的uid $applicant
  * @param 贷款申请表，数组结构 $issuing
+ * @param 布尔值，用来指明是否为“续期”操作 $renewal
  */
-function _cowpro_issuing_save_repayment_schedule($nid, $applicant, $issuing) {
-	$repayment_schedule = _cowpro_issuing_build_repayment_schedule_for_issuing($nid, $applicant, $issuing);
+function _cowpro_issuing_save_repayment_schedule($nid, $applicant, $issuing, $renewal, $renewal_loan_term, $renewal_annual_rate) {
+  if ($renewal === TRUE) {
+    //续期
+    $conditions = array (
+      'issuing_id' => $nid,
+    );
+    $reset = FALSE;
+    $schedules = entity_load ( 'cowpro_repayment_schedule', FALSE, $conditions, $reset );
+    $make_loans_time = 0;
+    foreach ($schedules as $schedule) {
+      if ($schedule->period == $schedule->period_total) {
+        //原来最后一期还款，本来应该还本金与利息，现在只还利息不还本金
+        if ($make_loans_time < $schedule->deadline) {
+          //考虑到可能存在多次续期的情况
+          $make_loans_time = $schedule->deadline;
+        }
+        $schedule->payable_amount = $schedule->interest;
+        $schedule->receivable_amount = $schedule->interest;
+        $schedule->capital = 0;
+        entity_save ( 'cowpro_repayment_schedule', $schedule );
+      }
+    }
+    
+    $annual_rate = $renewal_annual_rate;
+    $loan_term = $renewal_loan_term;
+    $method_repayment = $issuing['method_repayment'];
+    $make_loans_time = $make_loans_time;
+  } else {
+    $annual_rate = $issuing['annual_rate'];
+    $loan_term = $issuing['loan_term'];
+    $method_repayment = $issuing['method_repayment'];
+    $make_loans_time = $issuing['make_loans_time'];
+  }
+  $repayment_schedule = _cowpro_issuing_build_repayment_schedule_for_issuing($nid, $applicant, $annual_rate, $loan_term, $method_repayment, $make_loans_time);
 
 	//将“还款计划表”保存到数据库中
 	foreach($repayment_schedule as $schedule) {
