@@ -123,6 +123,7 @@ class cowpro_users_handler_filter_referee extends views_handler_filter {
   	$join->construct('user_relationships', $this->table_alias, 'uid', 'requester_id');
   	$this->query->add_table('user_relationships', NULL, $join);
   	$this->query->add_where($this->options['group'], "user_relationships.requestee_id", $uid, "=");
+  	$this->query->add_where($this->options['group'], "user_relationships.rtid", 1, "=");
   }
 }
 

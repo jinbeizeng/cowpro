@@ -90,7 +90,10 @@ function jiupaipay_issuing_publish($nid, $busiTradeType = "P01", $projectStatus 
 
 	$result_jpp = array ();
 	$result_jpp ['success'] = false;
-	$result ['outBody'] ['objectaccNo'] = $aes->decrypt ( $result ['outBody'] ['objectaccNo'] );
+  
+    if( !empty($result ['outBody'] ['objectaccNo']) ) {
+      $result ['outBody'] ['objectaccNo'] = $aes->decrypt ( $result ['outBody'] ['objectaccNo'] );
+    }
 
 	if ($result ['respHeader'] ['respCode'] == 'P2P0000' && _jiupaipay_verify_api ( $result ['outBody'], $result ['respHeader'] ['signature'], $result ['respHeader'] ['signTime'] )) {
 		if ($busiTradeType == "P01") {
